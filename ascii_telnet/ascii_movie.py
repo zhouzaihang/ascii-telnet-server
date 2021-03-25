@@ -112,6 +112,13 @@ class TimeBar(object):
                self.marker + \
                self._empty_timebar[marker_pos + len(self.right_decorator) + 1:]
 
+def count_ascii_alpha(s):
+    count = 0
+    for i in range(len(s)):
+        if (s[i] >= 'a' and s[i] <= 'z') or (s[i] >= 'A' and s[i] <= 'Z'):
+            count = count + 1
+
+    return count
 
 class Movie(object):
     def __init__(self, width=80, height=24):
@@ -127,8 +134,8 @@ class Movie(object):
         self.frames = []
         self._loaded = False
 
-        self._frame_width = 67
-        self._frame_height = 13
+        self._frame_width = 75
+        self._frame_height = 17
 
         f = Frame()
         f.data.append("No movie yet loaded.")
@@ -139,6 +146,8 @@ class Movie(object):
 
         self.left_margin = (self.screen_width - self._frame_width) // 2
         self.top_margin = (self.screen_height - self._frame_height - TimeBar.height) // 2
+
+        self.counter = 0
 
     def load(self, filepath):
         """
@@ -170,9 +179,13 @@ class Movie(object):
                     time_metadata = int(line.strip())
 
                 if time_metadata is not None:
+                    if self.counter > 5:
+                        time_metadata += 2 if time_metadata == 0 else (time_metadata+self.counter if time_metadata+self.counter < 40 else 40)
+                    self.counter = 0
                     current_frame = Frame(display_time=time_metadata)
                     self.frames.append(current_frame)
                 else:
+                    self.counter += count_ascii_alpha(line)
                     # First strip every white character from the right
                     # The amount of white space can be variable
                     line = line.rstrip()
