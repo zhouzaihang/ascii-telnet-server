@@ -71,12 +71,13 @@ class VT100Player(object):
         Plays the movie
         """
         self._stopped = False
-        for frame in self._movie.frames:
-            if self._stopped:
-                return
-            self._cursor += frame.display_time
-            self._load_frame(frame, self._cursor)
-            time.sleep(frame.display_time / 15)
+        while not self._stopped:
+            for frame in self._movie.frames:
+                if self._stopped:
+                    return
+                self._cursor += frame.display_time
+                self._load_frame(frame, self._cursor)
+                time.sleep(frame.display_time / 15)
 
     def stop(self):
         """
